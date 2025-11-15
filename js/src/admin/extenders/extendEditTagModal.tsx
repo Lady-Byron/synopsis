@@ -5,7 +5,10 @@ import Stream from 'flarum/common/utils/Stream';
 
 export default function () {
   extend(EditTagModal.prototype, 'oninit', function () {
-    this.richExcerpts = new Stream(this.tag.richExcerpts());
+    // [更改]
+    // 如果 this.tag.exists 为 true (编辑旧标签)，则使用已存的值。
+    // 如果为 false (新建标签)，则默认值设为 true。
+    this.richExcerpts = new Stream(this.tag.exists ? this.tag.richExcerpts() : true);
     this.excerptLength = new Stream(this.tag.excerptLength());
   });
 
