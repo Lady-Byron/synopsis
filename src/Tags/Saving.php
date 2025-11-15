@@ -23,7 +23,8 @@ class Saving
         $excerptLength = Arr::get($attributes, 'excerptLength', '');
         $event->tag->excerpt_length = $excerptLength === '' ? null : $excerptLength;
 
-        $richExcerpts = Arr::get($attributes, 'richExcerpts', false);
+        // [更改] 默认值从 false 改为 true
+        $richExcerpts = Arr::get($attributes, 'richExcerpts', true);
         $event->tag->rich_excerpts = $richExcerpts === null ? $richExcerpts : (bool) $richExcerpts;
     }
 }
