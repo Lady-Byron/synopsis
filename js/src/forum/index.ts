@@ -1,6 +1,5 @@
 import app from 'flarum/forum/app';
 import addSummaryExcerpt from './addSummaryExcerpt';
-import addUserPreference from './addUserPreference';
 
 export { default as extend } from './extend';
 
