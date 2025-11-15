@@ -8,5 +8,4 @@ export * from './utils';
 
 app.initializers.add('fof-synopsis', () => {
   addSummaryExcerpt();
-  addUserPreference();
 });
