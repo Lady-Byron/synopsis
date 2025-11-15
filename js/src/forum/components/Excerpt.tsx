@@ -43,8 +43,8 @@ export default class Excerpt extends Component<ExcerptAttrs> {
 
   getContent(): Mithril.Vnode | string {
     if (this.richExcerpt) {
-      // 我们仍然需要 truncateHtml 来截断 *文字*
-      // 图片截断将在 processExcerptDOM 钩子中处理
+      // truncateHtml 负责截断 *文字*
+      // (我们假设此文件已恢复为插件原始版本)
       const html = this.contentRich() ?? '';
       return m.trust(truncateHtml(html, this.length));
     }
@@ -84,23 +84,24 @@ export default class Excerpt extends Component<ExcerptAttrs> {
 
   /**
    * Mithril 钩子，在 DOM 渲染后运行
-   * 负责截断图片并添加 +N 角标
+   * 负责截断图片、清理空白节点，并添加 +N 角标
    */
   processExcerptDOM(vnode: Mithril.VnodeDOM<ExcerptAttrs, this>) {
     const dom = vnode.dom as HTMLElement;
 
-    // 如果不是富文本，或者已经处理过，则跳过
+    // 如果不是富文本，则跳过
     if (!this.richExcerpt) {
       dom.style.visibility = 'visible';
       return;
     }
     
-    // 防止在重绘时重复运行
+    // 防止在重绘时重复运行 (性能优化)
     if (dom.dataset.synopsisClamped === '1') {
-      dom.style.visibility = 'visible'; // 确保在重绘时它仍然可见
+      dom.style.visibility = 'visible';
       return;
     }
 
+    // --- 1. 图片截断 ---
     const imgs = Array.from(dom.querySelectorAll('img')).filter((i) => !i.classList.contains('emoji'));
 
     imgs.forEach((img, i) => {
@@ -115,12 +116,32 @@ export default class Excerpt extends Component<ExcerptAttrs> {
       }
     });
 
-    // 添加 +N 角标
+    // --- 2. [新] 空白节点清理 (来自成功的控制台测试) ---
+    const nodesToRemove: Node[] = [];
+    dom.childNodes.forEach(node => {
+      if (node.nodeType === 1) { // 元素节点
+        const text = node.textContent?.trim() || '';
+        
+        // 检查它是否是空的，或者 *只包含* "..."
+        if (text === '' || text === '...') {
+          // 确保这个节点里也没有图片 (防止误删)
+          if (!(node as HTMLElement).querySelector('img')) {
+            nodesToRemove.push(node);
+          }
+        }
+      }
+    });
+    
+    // 统一执行删除
+    nodesToRemove.forEach(node => node.remove());
+
+    // --- 3. 添加 +N 角标 ---
     const extra = Math.max(0, imgs.length - IMAGE_LIMIT);
     if (extra > 0 && !dom.querySelector('.synopsis-extra-badge')) {
       const badge = document.createElement('span');
       badge.className = 'synopsis-extra-badge';
       badge.textContent = `+${extra}`;
+      // [已修复] 现在 appendChild 会紧跟在最后一个节点后，没有空白
       dom.appendChild(badge);
     }
 
