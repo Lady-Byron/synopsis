@@ -49,18 +49,17 @@ export default function addSummaryExcerpt() {
       : app.forum.attribute<number>('synopsis.excerpt_length');
 
     
-    // --- [更改 2：富文本 - “最大值”优先 (true 优先)] ---
+    // --- [更改 2：最佳策略：“最小值”优先 (false 优先)] ---
 
-    // 1. 提取所有标签的富文本设置 (true / false)
+    // 1. 提取所有标签的富文本设置
     const tagSettings = tags.map(t => t.richExcerpts());
 
     // 2. 默认先使用全局设置
     let richExcerpt = app.forum.attribute<boolean>('synopsis.rich_excerpts');
 
-    // 3. 仅当有标签被设置时，才应用标签的逻辑
-    if (tagSettings.length > 0) {
-      // “取最大值”：只要有任何一个标签设置为 true，最终结果就是 true
-      richExcerpt = tagSettings.includes(true);
+    // 3. 检查所有标签，如果任何一个标签被设为 false，则强制使用 false
+    if (tagSettings.includes(false)) {
+      richExcerpt = false;
     }
 
     // --- [更改 3：强制移动端显示] ---
