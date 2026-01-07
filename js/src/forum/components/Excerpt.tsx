@@ -1,4 +1,5 @@
 import Component, { ComponentAttrs } from 'flarum/common/Component';
+import app from 'flarum/forum/app';
 import Post from 'flarum/common/models/Post';
 import { truncate } from 'flarum/common/utils/string';
 import type Mithril from 'mithril';
@@ -9,9 +10,6 @@ export interface ExcerptAttrs extends ComponentAttrs {
   length: number;
   richExcerpt: boolean;
 }
-
-// [新] 限制显示的图片数量
-const IMAGE_LIMIT = 3;
 
 export default class Excerpt extends Component<ExcerptAttrs> {
   post!: Post;
@@ -95,18 +93,29 @@ export default class Excerpt extends Component<ExcerptAttrs> {
       return;
     }
     
-    // 防止在重绘时重复运行 (性能优化)
-    if (dom.dataset.synopsisClamped === '1') {
+    // [修复] 使用 post id 检测内容是否变化，而非仅检查是否已处理
+    const currentPostId = this.post?.id?.() ?? '';
+    const processedPostId = dom.dataset.synopsisPostId;
+    
+    if (dom.dataset.synopsisClamped === '1' && processedPostId === currentPostId) {
       dom.style.visibility = 'visible';
       return;
     }
+    
+    // 如果 post 变化了，需要重置状态（虽然通常 Mithril 会重建 DOM）
+    if (processedPostId && processedPostId !== currentPostId) {
+      // 清除之前的角标
+      const oldBadge = dom.querySelector('.synopsis-extra-badge');
+      if (oldBadge) oldBadge.remove();
+    }
 
     // --- 1. 图片截断 ---
+    const imageLimit = app.forum.attribute<number>('synopsis.image_limit') ?? 3;
     const imgs = Array.from(dom.querySelectorAll('img')).filter((i) => !i.classList.contains('emoji'));
 
     imgs.forEach((img, i) => {
-      if (i < IMAGE_LIMIT) {
-        // 这是前 IMAGE_LIMIT 张图片，确保它们加载
+      if (i < imageLimit) {
+        // 这是前 imageLimit 张图片，确保它们加载
         this.ensureSrc(img);
         img.loading = 'lazy';
         img.decoding = 'async';
@@ -136,7 +145,7 @@ export default class Excerpt extends Component<ExcerptAttrs> {
     nodesToRemove.forEach(node => node.remove());
 
     // --- 3. 添加 +N 角标 ---
-    const extra = Math.max(0, imgs.length - IMAGE_LIMIT);
+    const extra = Math.max(0, imgs.length - imageLimit);
     if (extra > 0 && !dom.querySelector('.synopsis-extra-badge')) {
       const badge = document.createElement('span');
       badge.className = 'synopsis-extra-badge';
@@ -145,8 +154,9 @@ export default class Excerpt extends Component<ExcerptAttrs> {
       dom.appendChild(badge);
     }
 
-    // 标记为已处理
+    // 标记为已处理，并记录当前 post id
     dom.dataset.synopsisClamped = '1';
+    dom.dataset.synopsisPostId = this.post?.id?.() ?? '';
     
     // [新] 处理完成，显示内容
     dom.style.visibility = 'visible';
