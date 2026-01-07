@@ -1,28 +1,10 @@
-// Mixin for shared item excerpt styles
-.item-excerpt-styles() {
-  margin-top: 8px;
-  margin-right: 20px;
-  white-space: normal;
-  font-size: 12px;
-  line-height: 1.5em;
-  color: @muted-more-color;
-  display: block;
+// ============================================================
+// resources/less/forum/extension.less
+// ============================================================
 
-  * {
-    max-width: 100%;
-  }
-
-  .DiscussionPage-list & {
-    display: none;
-  }
-}
-
-// Apply shared styles to each specific selector
+// Styles for synopsis excerpts
 .DiscussionListItem-info {
-
-  // Styles for synopsis excerpts
   .Synopsis-excerpt {
-
     .FoFUpload--Upl-Image-Preview,
     img {
       max-height: 300px;
@@ -32,28 +14,26 @@
   }
 
   .item-excerpt {
-    .item-excerpt-styles();
-
-    // Additional styles specific to .item-excerpt
+    margin-top: 8px;
+    margin-right: 20px;
+    white-space: normal;
+    font-size: 12px;
+    line-height: 1.5em;
+    color: @muted-more-color;
+    display: block;
     pointer-events: none; // Fallback for `inert` HTML attribute
 
-    @media @phone {
-      display: none;
+    * {
+      max-width: 100%;
     }
-  }
 
-  .item-excerptM {
-    .item-excerpt-styles();
-
-    @media @tablet-up {
+    .DiscussionPage-list & {
       display: none;
     }
   }
 }
 
-/* * [新] 摘要中的“+N”图片角标
- * 它现在会自动使用站点的 @primary-color
- */
+// "+N" badge for extra images
 .synopsis-extra-badge {
   display: inline-block;
   margin-left: 6px;
@@ -62,5 +42,5 @@
   font-size: 12px;
   line-height: 18px;
   color: #fff;
-  background: @primary-color; 
+  background: @primary-color;
 }
