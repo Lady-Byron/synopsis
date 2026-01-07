@@ -20,11 +20,15 @@ class Saving
     {
         $attributes = Arr::get($event->data, 'attributes', []);
 
-        $excerptLength = Arr::get($attributes, 'excerptLength', '');
-        $event->tag->excerpt_length = $excerptLength === '' ? null : $excerptLength;
+        // [修复] 只在属性存在时才更新
+        if (Arr::has($attributes, 'excerptLength')) {
+            $excerptLength = Arr::get($attributes, 'excerptLength');
+            $event->tag->excerpt_length = $excerptLength === '' || $excerptLength === null ? null : (int) $excerptLength;
+        }
 
-        // [更改] 默认值从 false 改为 true
-        $richExcerpts = Arr::get($attributes, 'richExcerpts', true);
-        $event->tag->rich_excerpts = $richExcerpts === null ? $richExcerpts : (bool) $richExcerpts;
+        if (Arr::has($attributes, 'richExcerpts')) {
+            $richExcerpts = Arr::get($attributes, 'richExcerpts');
+            $event->tag->rich_excerpts = $richExcerpts === null ? null : (bool) $richExcerpts;
+        }
     }
 }
