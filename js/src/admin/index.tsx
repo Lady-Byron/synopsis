@@ -28,6 +28,13 @@ app.initializers.add('fof-synopsis', () => {
       type: 'boolean',
     })
     .registerSetting({
+      label: app.translator.trans('fof-synopsis.admin.settings.image-limit.label'),
+      help: app.translator.trans('fof-synopsis.admin.settings.image-limit.help'),
+      setting: 'fof-synopsis.image_limit',
+      type: 'number',
+      min: 0,
+    })
+    .registerSetting({
       label: app.translator.trans('fof-synopsis.admin.settings.excerpt-type.label'),
       help: app.translator.trans('fof-synopsis.admin.settings.excerpt-type.help'),
       setting: 'fof-synopsis.excerpt-type',
