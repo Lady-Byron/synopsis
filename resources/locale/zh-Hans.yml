@@ -1,0 +1,27 @@
+fof-synopsis:
+  admin:
+    settings:
+      disable-when-searching:
+        label: 搜索时禁用摘要
+        help: 启用后，搜索结果将显示默认的最相关帖子内容，而非摘要
+      excerpt-length:
+        label: 摘要字符长度
+        help: 从帖子中显示多少个字符
+      rich-excerpts:
+        label: 使用富文本显示摘要
+        help: 启用后，摘要中可能包含图片、嵌入内容和其他非文本元素
+      excerpt-type:
+        label: 使用哪个帖子作为摘要？
+        help: 选择使用首帖还是末帖作为摘要内容
+      first-label: 首帖
+      last-label: 末帖
+      tags-enabled: 您已启用 <code>flarum/tags</code>。这些设置将作为默认值，除非单独为某个标签设置了自己的配置。
+      image-limit:
+        label: 图片数量限制
+        help: 富文本摘要中显示的最大图片数量。设置为 0 则隐藏所有图片。
+  forum:
+    user:
+      settings:
+        summaries-heading: 摘要
+        show-summaries: 在讨论列表中显示每个讨论的摘要（桌面端/平板）
+        show-summaries-mobile: 在讨论列表中显示每个讨论的摘要（移动端）
