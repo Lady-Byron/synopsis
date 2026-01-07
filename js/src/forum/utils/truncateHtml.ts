@@ -1,3 +1,14 @@
+import truncateHtml from './truncateHtml';
+
+export const utils = {
+  truncateHtml,
+};
+
+
+// ============================================================
+// js/src/forum/utils/truncateHtml.ts
+// ============================================================
+
 /**
  * Safely truncate an HTML string without breaking opening/closing tags
  * Only characters in text nodes count towards the length
@@ -19,8 +30,16 @@ export default function (html: string, maxLength: number): string {
   const truncateNode = (node: Node) => {
     // 1. 如果长度已用完
     if (remaining <= 0) {
-      // 1a. 但如果它是图片或图片容器，我们必须保留它
-      if (node.nodeName === 'IMG' || node.nodeName === 'PICTURE') {
+      // 1a. 保留非 emoji 的图片
+      if (node.nodeName === 'IMG') {
+        const img = node as HTMLImageElement;
+        // emoji 图片应该随文字一起被截断，只保留内容图片
+        if (img.classList.contains('emoji')) {
+          node.parentNode?.removeChild(node);
+        }
+        return;
+      }
+      if (node.nodeName === 'PICTURE') {
         return;
       }
       
