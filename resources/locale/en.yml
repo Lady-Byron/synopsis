@@ -16,6 +16,9 @@ fof-synopsis:
       first-label: First post
       last-label: Last post
       tags-enabled: You have <code>flarum/tags</code> enabled. These settings will become default, unless per individual tags have their own setting.
+      image-limit:
+        label: Image Limit
+        help: Maximum number of images to display in rich excerpts. Set to 0 to hide all images.
   forum:
     user:
       settings:
