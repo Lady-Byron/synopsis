@@ -1,14 +1,3 @@
-import truncateHtml from './truncateHtml';
-
-export const utils = {
-  truncateHtml,
-};
-
-
-// ============================================================
-// js/src/forum/utils/truncateHtml.ts
-// ============================================================
-
 /**
  * Safely truncate an HTML string without breaking opening/closing tags
  * Only characters in text nodes count towards the length
@@ -17,11 +6,29 @@ export const utils = {
  * - 截断文本节点。
  * - 删除长度用尽后的 *非图片* 元素 (如 <p>, <li>)。
  * - *保留* <img> 和 <picture> 元素，以便 Excerpt.tsx 能对它们计数。
+ * - [性能优化] 添加 LRU 缓存，避免重复解析相同内容。
  *
  * @param html
- * @param length
+ * @param maxLength
  */
+
+// LRU 缓存：最多保留 100 条结果
+const cache = new Map<string, string>();
+const MAX_CACHE_SIZE = 100;
+
 export default function (html: string, maxLength: number): string {
+  // 生成缓存 key
+  const cacheKey = `${maxLength}:${html}`;
+  
+  // 命中缓存直接返回
+  const cached = cache.get(cacheKey);
+  if (cached !== undefined) {
+    // 移到末尾（LRU 策略：最近使用的放最后）
+    cache.delete(cacheKey);
+    cache.set(cacheKey, cached);
+    return cached;
+  }
+
   const parser = new DOMParser().parseFromString(html, 'text/html');
   
   // [修复] 使用闭包变量而非修改参数
@@ -83,5 +90,15 @@ export default function (html: string, maxLength: number): string {
 
   truncateNode(parser.body);
 
-  return parser.body.innerHTML;
+  const result = parser.body.innerHTML;
+  
+  // 存入缓存
+  if (cache.size >= MAX_CACHE_SIZE) {
+    // 删除最旧的（Map 迭代顺序是插入顺序）
+    const firstKey = cache.keys().next().value;
+    if (firstKey) cache.delete(firstKey);
+  }
+  cache.set(cacheKey, result);
+
+  return result;
 }
