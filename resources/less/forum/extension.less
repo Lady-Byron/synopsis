@@ -5,21 +5,11 @@
 // Styles for synopsis excerpts
 .DiscussionListItem-info {
   .Synopsis-excerpt {
-    // 预留最小高度，减少布局偏移
-    min-height: 1.5em;
-    
     .FoFUpload--Upl-Image-Preview,
     img {
       max-height: 300px;
       width: auto;
       object-fit: contain;
-    }
-
-    // NSFW 图片模糊
-    &.synopsis-nsfw {
-      img:not(.emoji) {
-        filter: blur(15px);
-      }
     }
   }
 
@@ -31,7 +21,7 @@
     line-height: 1.5em;
     color: @muted-more-color;
     display: block;
-    pointer-events: none;
+    pointer-events: none; // Fallback for `inert` HTML attribute
 
     * {
       max-width: 100%;
@@ -44,7 +34,6 @@
 }
 
 // "+N" badge for extra images
-// 使用绝对定位避免影响文本流
 .synopsis-extra-badge {
   display: inline-block;
   margin-left: 6px;
@@ -54,5 +43,11 @@
   line-height: 18px;
   color: #fff;
   background: @primary-color;
-  vertical-align: middle;
+}
+
+.Synopsis-excerpt.synopsis-nsfw {
+  img:not(.emoji) {
+    filter: blur(15px);
+    transition: none;  // 无 hover 效果
+  }
 }
