@@ -37,7 +37,7 @@ return [
         ->default('fof-synopsis.rich-excerpts', false)
         ->default('fof-synopsis.excerpt-type', 'first')
         ->default('fof-synopsis.disable-when-searching', true)
-        ->default('fof-synopsis.image_limit', 3)
+        ->default('fof-synopsis.image_limit', 1)
         ->serializeToForum('synopsis.excerpt_length', 'fof-synopsis.excerpt_length', 'intVal')
         ->serializeToForum('synopsis.rich_excerpts', 'fof-synopsis.rich-excerpts', 'boolVal')
         ->serializeToForum('synopsis.excerpt_type', 'fof-synopsis.excerpt-type')
