@@ -1,33 +1,8 @@
 {
-    "name": "fof/synopsis",
+    "name": "lady-byron/synopsis",
     "description": "Show summary excerpts on discussion lists.",
     "type": "flarum-extension",
-    "keywords": [
-        "flarum",
-        "discussion",
-        "summary",
-        "summaries",
-        "excerpt",
-        "excerpts",
-        "synopsis"
-    ],
     "license": "MIT",
-    "authors": [
-        {
-            "name": "IanM",
-            "email": "ian@flarum.org"
-        }
-    ],
-    "support": {
-        "issues": "https://github.com/friendsofflarum/synopsis/issues",
-        "source": "https://github.com/friendsofflarum/synopsis",
-        "forum": "https://discuss.flarum.org/d/37231"
-    },
-    "funding": [
-        {
-            "url": "https://www.buymeacoffee.com/ianm1"
-        }
-    ],
     "require": {
         "flarum/core": "^1.8.0",
         "flarum/tags": "*"
@@ -42,11 +17,11 @@
     },
     "extra": {
         "flarum-extension": {
-            "title": "FoF Synopsis",
+            "title": "Synopsis",
             "category": "feature",
             "icon": {
-                "name": "fas fa-comment-dots",
-                "backgroundColor": "#e74c3c",
+                "name": "fas fa-clipboard-list",
+                "backgroundColor": "#5B8C5A",
                 "color": "#fff"
             }
         },
