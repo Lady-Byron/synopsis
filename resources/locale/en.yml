@@ -6,7 +6,7 @@ fof-synopsis:
         help: When enabled, the default most relevant post excerpt will be used instead of the synopsis
       excerpt-length:
         label: Summary excerpt length in characters
-        help: How many characters should be displayed from the post.
+        help: How many characters should be displayed from the post
       rich-excerpts:
         label: Display excerpts using rich content
         help: When enabled, images, embeds and other non text elements may be included in the synopsis
@@ -15,13 +15,10 @@ fof-synopsis:
         help: Select if the first or last post be used for synopsis content
       first-label: First post
       last-label: Last post
-      tags-enabled: You have <code>flarum/tags</code> enabled. These settings will become default, unless per individual tags have their own setting.
+      tags-enabled: You have <code>flarum/tags</code> enabled. These settings will become default, unless per individual tags have their own setting
       image-limit:
         label: Image Limit
-        help: Maximum number of images to display in rich excerpts. Set to 0 to hide all images.
-  forum:
-    user:
-      settings:
-        summaries-heading: Synopsis
-        show-summaries: Display an excerpt from each discussion in discussion lists (Desktop/Tablet)
-        show-summaries-mobile: Display an excerpt from each discussion in discussion lists (Mobile)
+        help: Maximum number of images to display in rich excerpts. Set to 0 to hide all images
+      is-nsfw:
+        label: NSFW Tag
+        help: When enabled, images in excerpts for discussions with this tag will be blurred
