@@ -20,6 +20,7 @@ class AddTagsAttrs
     {
         $attributes['richExcerpts'] = $tag->rich_excerpts;
         $attributes['excerptLength'] = $tag->excerpt_length;
+        $attributes['isNsfw'] = $tag->is_nsfw;
 
         return $attributes;
     }
