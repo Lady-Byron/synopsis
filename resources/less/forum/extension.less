@@ -44,3 +44,10 @@
   color: #fff;
   background: @primary-color;
 }
+
+.Synopsis-excerpt.synopsis-nsfw {
+  img:not(.emoji) {
+    filter: blur(15px);
+    transition: none;  // 无 hover 效果
+  }
+}
