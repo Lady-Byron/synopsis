@@ -6,7 +6,7 @@ export { default as extend } from './extend';
 
 app.initializers.add('lady-byron-synopsis', () => {
   app.extensionData
-    .for('fof-synopsis')
+    .for('lady-byron-synopsis')
     .registerSetting(function () {
       if (!('flarum-tags' in flarum.extensions)) return;
       return (
