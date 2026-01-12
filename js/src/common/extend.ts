@@ -4,5 +4,6 @@ import Tag from 'flarum/tags/common/models/Tag';
 export default [
   new Extend.Model(Tag) //
     .attribute<boolean>('richExcerpts')
-    .attribute<number>('excerptLength'),
+    .attribute<number>('excerptLength')
+    .attribute<boolean>('isNsfw'),
 ];
