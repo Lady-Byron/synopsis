@@ -65,13 +65,20 @@ export default function addSummaryExcerpt() {
       richExcerpt = false;
     }
 
+    // --- [新增] NSFW 检测逻辑：任一标签 isNsfw=true → 整体图片模糊 ---
+    const nsfwSettings = tags
+      .filter(t => t && typeof t.isNsfw === 'function')
+      .map(t => t.isNsfw());
+    
+    const isNsfw = nsfwSettings.includes(true);
+
     // A length of zero means we don't want a synopsis for this discussion, so do nothing.
     if (excerptLength === 0) {
       return;
     }
 
     if (excerptPost) {
-      items.add('excerpt', <Excerpt post={excerptPost} length={excerptLength} richExcerpt={richExcerpt} />, -100);
+      items.add('excerpt', <Excerpt post={excerptPost} length={excerptLength} richExcerpt={richExcerpt} isNsfw={isNsfw} />, -100);
     }
   });
 }
