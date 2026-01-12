@@ -9,6 +9,7 @@ export interface ExcerptAttrs extends ComponentAttrs {
   post: Post;
   length: number;
   richExcerpt: boolean;
+  isNsfw: boolean;
 }
 
 export default class Excerpt extends Component<ExcerptAttrs> {
@@ -21,9 +22,12 @@ export default class Excerpt extends Component<ExcerptAttrs> {
   }
 
   view() {
+    const { isNsfw } = this.attrs;
+    const className = 'Synopsis-excerpt' + (isNsfw ? ' synopsis-nsfw' : '');
+    
     return (
       <div
-        className="Synopsis-excerpt"
+        className={className}
         style={{ visibility: 'hidden' }}
         oncreate={this.boundProcessDOM}
         onupdate={this.boundProcessDOM}
