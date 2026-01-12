@@ -30,7 +30,8 @@ return [
 
     (new Extend\Model(Tag::class))
         ->cast('excerpt_length', 'int')
-        ->cast('rich_excerpts', 'bool'),
+        ->cast('rich_excerpts', 'bool')
+        ->cast('is_nsfw', 'bool'),
 
     (new Extend\Settings())
         ->default('fof-synopsis.excerpt_length', 200)
