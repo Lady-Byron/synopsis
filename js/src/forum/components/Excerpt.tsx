@@ -3,7 +3,7 @@ import app from 'flarum/forum/app';
 import Post from 'flarum/common/models/Post';
 import { truncate } from 'flarum/common/utils/string';
 import type Mithril from 'mithril';
-import truncateHtml from '../utils/truncateHtml';
+import truncateHtml, { TruncateResult } from '../utils/truncateHtml';
 
 export interface ExcerptAttrs extends ComponentAttrs {
   post: Post;
@@ -13,26 +13,20 @@ export interface ExcerptAttrs extends ComponentAttrs {
 }
 
 export default class Excerpt extends Component<ExcerptAttrs> {
-  // 绑定后的方法引用，避免每次 view() 重复创建
-  private boundProcessDOM!: (vnode: Mithril.VnodeDOM<ExcerptAttrs, this>) => void;
-
-  oninit(vnode: Mithril.Vnode<ExcerptAttrs, this>) {
-    super.oninit(vnode);
-    this.boundProcessDOM = this.processExcerptDOM.bind(this);
-  }
+  // 缓存截断结果，避免 view() 重复计算
+  private truncateResult: TruncateResult | null = null;
 
   view() {
-    const { isNsfw } = this.attrs;
+    const { isNsfw, richExcerpt } = this.attrs;
     const className = 'Synopsis-excerpt' + (isNsfw ? ' synopsis-nsfw' : '');
     
+    const content = this.getContent();
+    const extraBadge = this.getExtraBadge();
+    
     return (
-      <div
-        className={className}
-        style={{ visibility: 'hidden' }}
-        oncreate={this.boundProcessDOM}
-        onupdate={this.boundProcessDOM}
-      >
-        {this.getContent()}
+      <div className={className}>
+        {content}
+        {extraBadge}
       </div>
     );
   }
@@ -42,114 +36,25 @@ export default class Excerpt extends Component<ExcerptAttrs> {
     
     if (richExcerpt) {
       const html = post.contentHtml() ?? '';
-      return m.trust(truncateHtml(html, length));
+      const imageLimit = app.forum.attribute<number>('synopsis.image_limit') ?? 1;
+      this.truncateResult = truncateHtml(html, length, imageLimit);
+      return m.trust(this.truncateResult.html);
     }
 
+    this.truncateResult = null;
     return truncate(post.contentPlain() ?? '', length);
   }
 
-  // --- [新] 从页脚脚本移植的逻辑 ---
-
-  /**
-   * 确保懒加载图片有 src
-   */
-  ensureSrc(img: HTMLImageElement) {
-    const cand =
-      img.getAttribute('data-src') ||
-      img.getAttribute('data-original') ||
-      img.getAttribute('data-lazy') ||
-      img.getAttribute('data-url');
-    if (!img.getAttribute('src') && cand) img.setAttribute('src', cand);
-
-    const pic = img.parentElement?.tagName?.toLowerCase() === 'picture' ? img.parentElement : null;
-    if (pic) {
-      pic.querySelectorAll('source').forEach((s) => {
-        const ss = s.getAttribute('data-srcset');
-        if (ss && !s.getAttribute('srcset')) s.setAttribute('srcset', ss);
-      });
-    }
-  }
-
-  /**
-   * Mithril 钩子，在 DOM 渲染后运行
-   * 负责截断图片、清理空白节点，并添加 +N 角标
-   */
-  processExcerptDOM(vnode: Mithril.VnodeDOM<ExcerptAttrs, this>) {
-    const dom = vnode.dom as HTMLElement;
-    const { post, richExcerpt } = this.attrs;
-
-    // 如果不是富文本，则跳过
-    if (!richExcerpt) {
-      dom.style.visibility = 'visible';
-      return;
+  getExtraBadge(): Mithril.Vnode | null {
+    if (!this.truncateResult) return null;
+    
+    const imageLimit = app.forum.attribute<number>('synopsis.image_limit') ?? 1;
+    const extra = Math.max(0, this.truncateResult.totalImages - imageLimit);
+    
+    if (extra > 0) {
+      return <span className="synopsis-extra-badge">+{extra}</span>;
     }
     
-    // [修复] 使用 post id 检测内容是否变化，而非仅检查是否已处理
-    const currentPostId = post?.id?.() ?? '';
-    const processedPostId = dom.dataset.synopsisPostId;
-    
-    if (dom.dataset.synopsisClamped === '1' && processedPostId === currentPostId) {
-      dom.style.visibility = 'visible';
-      return;
-    }
-    
-    // 如果 post 变化了，需要重置状态（虽然通常 Mithril 会重建 DOM）
-    if (processedPostId && processedPostId !== currentPostId) {
-      // 清除之前的角标
-      const oldBadge = dom.querySelector('.synopsis-extra-badge');
-      if (oldBadge) oldBadge.remove();
-    }
-
-    // --- 1. 图片截断 ---
-    const imageLimit = app.forum.attribute<number>('synopsis.image_limit') ?? 3;
-    const imgs = Array.from(dom.querySelectorAll('img')).filter((i) => !i.classList.contains('emoji'));
-
-    imgs.forEach((img, i) => {
-      if (i < imageLimit) {
-        // 这是前 imageLimit 张图片，确保它们加载
-        this.ensureSrc(img);
-        img.loading = 'lazy';
-        img.decoding = 'async';
-      } else {
-        // 这是多余的图片，从 DOM 中移除
-        img.remove();
-      }
-    });
-
-    // --- 2. [新] 空白节点清理 (来自成功的控制台测试) ---
-    const nodesToRemove: Node[] = [];
-    dom.childNodes.forEach(node => {
-      if (node.nodeType === 1) { // 元素节点
-        const text = node.textContent?.trim() || '';
-        
-        // 检查它是否是空的，或者 *只包含* "..."
-        if (text === '' || text === '...') {
-          // 确保这个节点里也没有图片 (防止误删)
-          if (!(node as HTMLElement).querySelector('img')) {
-            nodesToRemove.push(node);
-          }
-        }
-      }
-    });
-    
-    // 统一执行删除
-    nodesToRemove.forEach(node => node.remove());
-
-    // --- 3. 添加 +N 角标 ---
-    const extra = Math.max(0, imgs.length - imageLimit);
-    if (extra > 0 && !dom.querySelector('.synopsis-extra-badge')) {
-      const badge = document.createElement('span');
-      badge.className = 'synopsis-extra-badge';
-      badge.textContent = `+${extra}`;
-      // [已修复] 现在 appendChild 会紧跟在最后一个节点后，没有空白
-      dom.appendChild(badge);
-    }
-
-    // 标记为已处理，并记录当前 post id
-    dom.dataset.synopsisClamped = '1';
-    dom.dataset.synopsisPostId = post?.id?.() ?? '';
-    
-    // [新] 处理完成，显示内容
-    dom.style.visibility = 'visible';
+    return null;
   }
 }
