@@ -10,11 +10,13 @@ export default function () {
     // 如果为 false (新建标签)，则默认值设为 true。
     this.richExcerpts = new Stream(this.tag.exists ? this.tag.richExcerpts() : true);
     this.excerptLength = new Stream(this.tag.excerptLength());
+    this.isNsfw = new Stream(this.tag.exists ? this.tag.isNsfw() : false);
   });
 
   extend(EditTagModal.prototype, 'submitData', function (data) {
     data.richExcerpts = this.richExcerpts();
     data.excerptLength = this.excerptLength();
+    data.isNsfw = this.isNsfw();
 
     return data;
   });
@@ -40,6 +42,20 @@ export default function () {
           </label>
         </div>
         <div>{app.translator.trans('fof-synopsis.admin.settings.rich-excerpts.help')}</div>
+      </div>,
+      5
+    );
+
+    items.add(
+      'synopsis-is-nsfw',
+      <div className="Form-group">
+        <div>
+          <label className="checkbox">
+            <input type="checkbox" bidi={this.isNsfw} />
+            {app.translator.trans('fof-synopsis.admin.settings.is-nsfw.label')}
+          </label>
+        </div>
+        <div>{app.translator.trans('fof-synopsis.admin.settings.is-nsfw.help')}</div>
       </div>,
       5
     );
