@@ -4,7 +4,7 @@ import typeOptions from './util/typeOptions';
 
 export { default as extend } from './extend';
 
-app.initializers.add('fof-synopsis', () => {
+app.initializers.add('lady-byron-synopsis', () => {
   app.extensionData
     .for('fof-synopsis')
     .registerSetting(function () {
