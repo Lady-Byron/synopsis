@@ -15,13 +15,10 @@ fof-synopsis:
         help: 选择使用首帖还是末帖作为摘要内容
       first-label: 首帖
       last-label: 末帖
-      tags-enabled: 您已启用 <code>flarum/tags</code>。这些设置将作为默认值，除非单独为某个标签设置了自己的配置。
+      tags-enabled: 您已启用 <code>flarum/tags</code>。这些设置将作为默认值，除非单独为某个标签设置了自己的配置
       image-limit:
         label: 图片数量限制
-        help: 富文本摘要中显示的最大图片数量。设置为 0 则隐藏所有图片。
-  forum:
-    user:
-      settings:
-        summaries-heading: 摘要
-        show-summaries: 在讨论列表中显示每个讨论的摘要（桌面端/平板）
-        show-summaries-mobile: 在讨论列表中显示每个讨论的摘要（移动端）
+        help: 富文本摘要中显示的最大图片数量。设置为 0 则隐藏所有图片
+      is-nsfw:
+        label: NSFW 标签
+        help: 启用后，带有此标签的讨论在摘要中的图片将被模糊处理
