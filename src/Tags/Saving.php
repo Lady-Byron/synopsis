@@ -30,5 +30,10 @@ class Saving
             $richExcerpts = Arr::get($attributes, 'richExcerpts');
             $event->tag->rich_excerpts = $richExcerpts === null ? null : (bool) $richExcerpts;
         }
+
+        if (Arr::has($attributes, 'isNsfw')) {
+            $isNsfw = Arr::get($attributes, 'isNsfw');
+            $event->tag->is_nsfw = $isNsfw === null ? null : (bool) $isNsfw;
+        }
     }
 }
