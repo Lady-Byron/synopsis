@@ -12,27 +12,21 @@ export interface ExcerptAttrs extends ComponentAttrs {
 }
 
 export default class Excerpt extends Component<ExcerptAttrs> {
-  post!: Post;
-  length!: number;
-  richExcerpt!: boolean;
+  // 绑定后的方法引用，避免每次 view() 重复创建
+  private boundProcessDOM!: (vnode: Mithril.VnodeDOM<ExcerptAttrs, this>) => void;
 
   oninit(vnode: Mithril.Vnode<ExcerptAttrs, this>) {
     super.oninit(vnode);
-
-    this.post = this.attrs.post;
-    this.length = this.attrs.length;
-    this.richExcerpt = this.attrs.richExcerpt;
+    this.boundProcessDOM = this.processExcerptDOM.bind(this);
   }
 
   view() {
-    // [新] 添加 oncreate/onupdate 钩子来处理 DOM
-    // 并使用 'visibility' 来防止图片在处理完之前闪烁
     return (
       <div
         className="Synopsis-excerpt"
         style={{ visibility: 'hidden' }}
-        oncreate={this.processExcerptDOM.bind(this)}
-        onupdate={this.processExcerptDOM.bind(this)}
+        oncreate={this.boundProcessDOM}
+        onupdate={this.boundProcessDOM}
       >
         {this.getContent()}
       </div>
@@ -40,22 +34,14 @@ export default class Excerpt extends Component<ExcerptAttrs> {
   }
 
   getContent(): Mithril.Vnode | string {
-    if (this.richExcerpt) {
-      // truncateHtml 负责截断 *文字*
-      // (我们假设此文件已恢复为插件原始版本)
-      const html = this.contentRich() ?? '';
-      return m.trust(truncateHtml(html, this.length));
+    const { post, length, richExcerpt } = this.attrs;
+    
+    if (richExcerpt) {
+      const html = post.contentHtml() ?? '';
+      return m.trust(truncateHtml(html, length));
     }
 
-    return truncate(this.contentPlain() ?? '', this.length);
-  }
-
-  contentRich() {
-    return this.post.contentHtml();
-  }
-
-  contentPlain() {
-    return this.post.contentPlain();
+    return truncate(post.contentPlain() ?? '', length);
   }
 
   // --- [新] 从页脚脚本移植的逻辑 ---
@@ -86,15 +72,16 @@ export default class Excerpt extends Component<ExcerptAttrs> {
    */
   processExcerptDOM(vnode: Mithril.VnodeDOM<ExcerptAttrs, this>) {
     const dom = vnode.dom as HTMLElement;
+    const { post, richExcerpt } = this.attrs;
 
     // 如果不是富文本，则跳过
-    if (!this.richExcerpt) {
+    if (!richExcerpt) {
       dom.style.visibility = 'visible';
       return;
     }
     
     // [修复] 使用 post id 检测内容是否变化，而非仅检查是否已处理
-    const currentPostId = this.post?.id?.() ?? '';
+    const currentPostId = post?.id?.() ?? '';
     const processedPostId = dom.dataset.synopsisPostId;
     
     if (dom.dataset.synopsisClamped === '1' && processedPostId === currentPostId) {
@@ -156,7 +143,7 @@ export default class Excerpt extends Component<ExcerptAttrs> {
 
     // 标记为已处理，并记录当前 post id
     dom.dataset.synopsisClamped = '1';
-    dom.dataset.synopsisPostId = this.post?.id?.() ?? '';
+    dom.dataset.synopsisPostId = post?.id?.() ?? '';
     
     // [新] 处理完成，显示内容
     dom.style.visibility = 'visible';
