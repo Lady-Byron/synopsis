@@ -13,11 +13,11 @@
         }
     },
     "replace": {
-        "ianm/synopsis": "*"
+        "fof/synopsis": "*"
     },
     "extra": {
         "flarum-extension": {
-            "title": "Synopsis",
+            "title": "Flop Synopsis",
             "category": "feature",
             "icon": {
                 "name": "fas fa-clipboard-list",
