@@ -19,7 +19,7 @@ class DefaultSettingsTest extends TestCase
     {
         parent::setup();
 
-        $this->extension('flarum-tags', 'fof-synopsis');
+        $this->extension('flarum-tags', 'lady-byron-synopsis');
     }
 
     /**

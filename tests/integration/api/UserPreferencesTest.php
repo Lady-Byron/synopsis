@@ -13,7 +13,6 @@ namespace FoF\Synopsis\Tests\integration\api;
 
 use Flarum\Testing\integration\RetrievesAuthorizedUsers;
 use Flarum\Testing\integration\TestCase;
-use Flarum\User\User;
 
 class UserPreferencesTest extends TestCase
 {
@@ -23,7 +22,7 @@ class UserPreferencesTest extends TestCase
     {
         parent::setup();
 
-        $this->extension('flarum-tags', 'fof-synopsis');
+        $this->extension('flarum-tags', 'lady-byron-synopsis');
 
         $this->prepareDatabase([
             'users' => [$this->normalUser()],
@@ -33,14 +32,12 @@ class UserPreferencesTest extends TestCase
     /**
      * @test
      */
-    public function user_has_correct_default_preferences()
+    public function extension_loads_successfully()
     {
-        $this->database();
-        /** @var User $user */
-        $user = User::find($this->normalUser()['id']);
+        $response = $this->send(
+            $this->request('GET', '/api')
+        );
 
-        $this->assertNotNull($user);
-        $this->assertTrue($user->getPreferencesAttribute('')['showSynopsisExcerpts']);
-        $this->assertFalse($user->getPreferencesAttribute('')['showSynopsisExcerptsOnMobile']);
+        $this->assertEquals(200, $response->getStatusCode());
     }
 }

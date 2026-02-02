@@ -2,7 +2,7 @@
   "name": "@fof/synopsis",
   "private": true,
   "version": "0.1.0",
-  "description": "Toolbar tag filter with grouped view when Tag Categories is enabled.",
+  "description": "Show summary excerpts on discussion lists.",
   "scripts": {
     "build": "webpack --mode production",
     "dev": "webpack --mode development --watch",

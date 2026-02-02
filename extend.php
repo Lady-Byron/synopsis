@@ -42,7 +42,7 @@ return [
         ->serializeToForum('synopsis.excerpt_length', 'fof-synopsis.excerpt_length', 'intVal')
         ->serializeToForum('synopsis.rich_excerpts', 'fof-synopsis.rich-excerpts', 'boolVal')
         ->serializeToForum('synopsis.excerpt_type', 'fof-synopsis.excerpt-type')
-        ->serializeToForum('synopsis.disable_when_searching', 'fof-synopsis.disable-when-searching', 'boolval')
+        ->serializeToForum('synopsis.disable_when_searching', 'fof-synopsis.disable-when-searching', 'boolVal')
         ->serializeToForum('synopsis.image_limit', 'fof-synopsis.image_limit', 'intVal'),
 
     (new Extend\ApiController(ListDiscussionsController::class))
