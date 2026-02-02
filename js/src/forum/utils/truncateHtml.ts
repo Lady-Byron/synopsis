@@ -18,13 +18,23 @@ export interface TruncateResult {
   totalImages: number;  // 原始图片总数（不含 emoji）
 }
 
+// 简单哈希函数，避免将完整 HTML 作为缓存 key 占用大量内存
+function hashCode(str: string): number {
+  let hash = 0x811c9dc5; // FNV offset basis
+  for (let i = 0; i < str.length; i++) {
+    hash ^= str.charCodeAt(i);
+    hash = (hash * 0x01000193) >>> 0; // FNV prime, unsigned
+  }
+  return hash;
+}
+
 // LRU 缓存：最多保留 100 条结果
 const cache = new Map<string, TruncateResult>();
 const MAX_CACHE_SIZE = 100;
 
 export default function (html: string, maxLength: number, imageLimit: number = 1): TruncateResult {
-  // 生成缓存 key
-  const cacheKey = `${maxLength}:${imageLimit}:${html}`;
+  // 使用哈希 + 长度组合作为缓存 key，避免存储完整 HTML 字符串
+  const cacheKey = `${maxLength}:${imageLimit}:${html.length}:${hashCode(html)}`;
   
   // 命中缓存直接返回
   const cached = cache.get(cacheKey);
