@@ -29,9 +29,6 @@ export default function addSummaryExcerpt() {
 
     const discussion = this.attrs.discussion;
 
-    // [已移除] 删除了对 app.session.user.preferences().showSynopsisExcerpts 的检查
-    // 摘要将对所有用户强制显示
-
     // --- [更改 1：取最小值逻辑] ---
     const tags = discussion.tags() || []; // 确保 tags 是一个数组
 
